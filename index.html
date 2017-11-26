@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ENGLISH LEVEL</title>
+	<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="dist/css/style.css">
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+	<header>
+		<div>
+			<img src="dist/img/logo.png" style="width: 80%; max-width: 500px;">
+		</div>
+	</header>
+
+	<section id="login" class="container">
+		<div class="row">
+			<div class="col-xs-6">
+				<form id="form_login">
+	                <div class="form-group">
+	                    <label>E-mail</label>
+	                    <input class="form-control" type="text" id="" name="mail" placeholder="Escriba su Correo Electronico" value="jesus@mail">
+	                </div>
+	                <div class="form-group">
+	                    <label>Contrase&ntilde;a</label>
+	                    <input class="form-control" type="text" id="" name="contrasena" placeholder="Escriba su Contrase&ntilde;a" value="asd">
+	                </div>
+	                <button class="btn btn-primary btn-lg center-block" type="button" id="bt_entrar">Entrar</button>
+            	</form>
+            	<center><a href="registro.html">No tengo una cuenta</a></center>
+            	<br>
+            	<div id="mensaje" style="color: red" class="text-center"></div>
+			</div>
+
+			<div class="col-xs-6">
+				<img src="dist/img/bandera.png" style="width: 100%; opacity: 0.65;">
+			</div>
+		</div>
+	</section>
+
+	<footer>
+		<p>Todos los derechos reservados<p>
+		<p>Universidad de Cordoba</p>
+	</footer>
+
+	<script src="dist/js/jquery.js"></script>
+	<script>
+		$(document).ready(function() {
+            console.log( "ready!" );
+            console.clear();
+
+            $("#bt_entrar").click(function(){
+            	var base_url = "http://localhost/_Raiz/jesus%20flores/backend/api/";
+
+                $.ajax({
+                    type: "POST",
+                    //concatenamos la direccion del backend con la consulta que se quiere realizar
+                    url: base_url+"login", //urlbase + consulta
+                    //tipo de dato retornado
+                    dataType: "json",
+                    //formulario donde se encuentran los datos
+                    data: $( "#form_login" ).serialize() ,
+                    //en caso de que se ejecute satisfactoriamente el en envio
+                    success: function(result){
+                        //limpiamos la consola y mostramos los datos como prueba de escritorio, esto no es necesario
+                        console.clear();
+                        console.log( "status: " + result.status );
+                        console.log( "data: " + result.data );
+                        console.log( "mensaje: " + result.message );
+                        //limpiamos el formulario
+                        $("#form_login")[0].reset();
+
+                        if (result.data) {
+                        	localStorage.setItem('myLogin', JSON.stringify(result.data[0]));
+                        	//var obj = localStorage.getItem('myLogin');
+                        	//console.log(JSON.parse(obj));
+
+                        	$(location).attr('href','home.html');
+
+                        } else {
+                        	$("#mensaje").html("El correo o la contraseña son incorrectos.");
+                        }
+
+                    },
+                });
+	    	});
+        });
+	</script>
+</body>
+</html>

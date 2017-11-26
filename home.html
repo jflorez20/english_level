@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ENGLISH LEVEL</title>
+	<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="dist/css/style.css">
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+	<header>
+		<div>
+			<img src="dist/img/logo.png" style="width: 80%; max-width: 500px;">
+		</div>
+		<div style="color: red;" class="h1">Helo! <span id="name"></span></div>
+	</header>
+	<section id="contenido" class="container">
+		<div class="row">
+			<div class="col-xs-4">
+				<select class="form-control" id="select">
+					<option></option>
+					<option value="1">1: Facil</option>
+					<option value="2">2: Medio</option>
+					<option value="3">3: Avanzado</option>
+				</select>
+				<br>
+				<br>
+				<br>
+				<button class="btn btn-primary btn-lg center-block" type="button" id="bt_practicar">Practicar</button>
+				<br>
+			</div>
+			<div class="col-xs-4" id="text">
+				<p>Felicidades ya est&aacute;s en English Level. Ahora podr&aacute;s practicar de manera din&aacute;mica vocabularios y gram&aacute;tica inglesa.</p>
+				<button class="btn btn-primary center-block" id="bt_prog">Ver Progreso</button>
+			</div>
+			<div class="col-xs-4">
+				<img src="dist/img/bandera.png" style="width: 100%; opacity: 0.65;">
+			</div>
+		</div>
+	</section>
+
+	<div class="prog">
+		
+	</div>
+
+	<footer>
+		<p>Todos los derechos reservados<p>
+		<p>Universidad de Cordoba</p>
+	</footer>
+	<script src="dist/js/jquery.js"></script>
+	<script>
+		$(document).ready(function() {
+            console.log( "ready!" );
+	    	console.clear();
+	    	//---------------------------------
+	    	var obj = localStorage.getItem('myLogin');
+            obj = JSON.parse(obj);
+            console.log(obj.nombre);
+	    	$("#name").html(obj.nombre+" "+obj.apellidos);
+
+            $("#bt_practicar").click(function(){
+            	localStorage.level = $("#select").val();
+            	$(location).attr('href','juego.html');
+	    	});
+
+	    	var base_url = "http://localhost/_Raiz/jesus%20flores/backend/api/";
+
+	    	$.ajax({
+                type: "GET",
+                url: base_url+"progreso/"+obj.id_usuario,
+                dataType: "json",
+                success: function(result){
+                    console.clear();
+                    console.log( "status: " + result.status );
+                    console.log( "data-score: " + result.data );
+                    console.log( "mensaje: " + result.message );
+                    if (result.data) {
+                    	var tabla = "<table class='table'>";
+                    		tabla +="<tr>";
+	                    	tabla +="<th>Aciertos</th>";
+	                    	tabla +="<th>Errores</th>";
+	                    	tabla +="<th>Dificultad</th>";
+	                    	tabla +="</tr>";
+
+                    	result.data.forEach(function(element) {
+	                    	tabla +="<tr>";
+	                    	tabla +="<td>"+element.aciertos+"</td>";
+	                    	tabla +="<td>"+element.errores+"</td>";
+	                    	if (element.id_dificultad == 1) {
+	                    		tabla +="<td>Facil</td>";
+	                    	} else if (element.id_dificultad == 2) {
+	                    		tabla +="<td>Medio</td>";
+	                    	}else if (element.id_dificultad == 3) {
+	                    		tabla +="<td>Avanzado</td>";
+	                    	}
+	                    	tabla +="</tr>";
+						});
+						tabla += "</table>";
+						console.log(tabla);
+						$(".prog").html(tabla);
+                    }
+                }
+            });
+	    	$("#bt_prog").hover(function() {
+	    		$(".prog").css("display","block");
+	    	}, function() {
+	    		$(".prog").css("display","none");
+	    	}
+	    	);
+        });
+	</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ENGLISH LEVEL</title>
+	<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="dist/css/style.css">
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<style type="text/css">
+		.alert {
+			display: none;
+		}
+	</style>
+</head>
+<body onload="">
+	<header>
+		<div>
+			<img src="dist/img/logo.png" style="width: 80%; max-width: 500px; ">
+		</div>
+		<div id="score">
+			<ul>
+				<li>Dificultad <span id="a">_</span></li>
+				<li>Correctas <span id="b">_</span></li>
+				<li>Incorrectas <span id="c">_</span></li>
+				<li>Total <span id="d">_</span></li>
+			</ul>
+		</div>
+	</header>
+
+	<section id="juego" class="container">
+
+		<div class="row">
+			<div class="col-xs-6">
+				<img id="img_preg" src="dist/img/bandera.png" style="width: 100%; opacity: 0.65; max-height: 230px;">
+				<hr>
+				<button class="btn btn-danger btn-lg center-block" type="button" id="bt_Finish">Finish</button>
+			</div>
+
+			<div class="col-xs-6">
+				<form>
+					<div class="pregunta">
+						<h3 id="enunciado">_?</h3>
+						<input type="radio" name="resp" value="1"><span id="resp1"> _.</span><br>
+						<input type="radio" name="resp" value="2"><span id="resp2"> _.</span><br>
+						<input type="radio" name="resp" value="3"><span id="resp3"> _.</span><br>
+						<hr>
+						<button class="btn btn-success btn-lg center-block" type="button" id="bt_check">Check</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="text-center">
+			<div class="alert good">
+				<div><span class="glyphicon ico">&#xe089;</span></div>
+				<div class="h1">Good job¡</div>
+				<div>you clicked the button¡</div>
+				<br>
+				<button class="btn btn-primary btn-lg center-block bt_continue" type="button" id="bt_continue">Continue</button>
+			</div>
+			<div class="alert bad">
+				<div><span class="glyphicon ico">&#xe088;</span></div>
+				<div class="h1">Bad job¡</div>
+				<div>you clicked the button¡</div>
+				<br>
+				<button class="btn btn-primary btn-lg center-block bt_continue" type="button" id="bt_continue">Continue</button>
+			</div>
+		</div>
+	</section>
+
+	<footer>
+		<p>Todos los derechos reservados<p>
+		<p>Universidad de Cordoba</p>
+	</footer>
+
+	<script src="dist/js/jquery.js"></script>
+	<script>
+		$(document).ready(function() {
+            console.log( "ready!" );
+	    	console.clear();
+
+	    	$("#bt_Finish").click(function(){
+            	$(location).attr('href','home.html');
+	    	});
+	    	
+	    	var	id_juego = "";
+	    	//-------------consulta-------------
+	    	var base_url = "http://localhost/_Raiz/jesus%20flores/backend/api/";
+
+	    	var obj = localStorage.getItem('myLogin');
+            obj = JSON.parse(obj);
+	    	var	level = Number(localStorage.level);
+
+	    	//console.log(obj.id_usuario);
+
+	    	function cargar_score() {
+	    		// body...
+		    	$.ajax({
+	                type: "POST",
+	                url: base_url+"selet_juego",
+	                dataType: "json",
+	                data: "id_u="+obj.id_usuario+"&id_d="+level,
+	                success: function(result){
+	                    console.clear();
+	                    //console.log( "status: " + result.status );
+	                    //console.log( "data-score: " + result.data );
+	                    //console.log( "mensaje: " + result.message );
+	                    if (result.data) {
+	                    	$("#a").html(result.data[0].id_dificultad);
+	                    	$("#b").html(result.data[0].aciertos);
+	                    	$("#c").html(result.data[0].errores);
+	                    	var total = Number(result.data[0].aciertos) + Number(result.data[0].errores);
+	                    	$("#d").html(total);
+
+	                    	console.log(result.data[0]);//juego
+	                    	id_juego = result.data[0].id_juego;
+	                    }
+	                }
+	            });
+	    	}
+	    	cargar_score();
+            //----------------------------------
+		
+	    	var respuesta = 0;
+	    	//------------consulta--------------
+	    	console.clear();
+
+	    	function cargar_pregunta() {
+		    	$.ajax({
+	                type: "GET",
+	                url: base_url+"pregunta/"+level,
+	                dataType: "json",
+	                success: function(result){
+	                    //console.clear();
+	                    //console.log( "status: " + result.status );
+	                    //console.log( "data: " + result.data );
+	                    //console.log( "mensaje: " + result.message );
+	                    if (result.data) {
+	                    	//console.log(result.data);
+	                    	respuesta = result.data.correcta;
+	                    	//console.log("respuesta: "+respuesta);
+
+	                    	$("#img_preg").attr("src","dist/img/"+result.data.img);
+	                    	$("#enunciado").html(result.data.enunciado);
+	                    	$("#resp1").html(result.data.resp1);
+	                    	$("#resp2").html(result.data.resp2);
+	                    	$("#resp3").html(result.data.resp3);
+	                    }
+	                }
+	            });
+            }
+	    	cargar_pregunta();
+	    	//----------------------------------
+
+            $("#bt_check").click(function(){
+            	console.clear();
+
+            	var checked = $('input:radio[name=resp]:checked').val();
+
+            	if (checked == respuesta) {
+            		$(".good").css("display","block");
+            		//-------------consulta-------------
+            		$.ajax({
+		                type: "POST",
+		                url: base_url+"sumar/"+id_juego,
+		                dataType: "json",
+		                data: "a=1&e=0",
+
+		                success: function(result){
+		                    console.clear();
+		                    console.log( "status: " + result.status );
+		                    console.log( "data-score: " + result.data );
+		                    console.log( "mensaje: " + result.message );
+		                    if (result.data) {
+		                    	console.log(result.data[0]);
+		                    }
+		                }
+		            });
+            		//----------------------------------
+            	} else {
+            		$(".bad").css("display","block");
+            		//-------------consulta-------------
+            		$.ajax({
+		                type: "POST",
+		                url: base_url+"sumar/"+id_juego,
+		                dataType: "json",
+		                data: "a=0&e=1",
+
+		                success: function(result){
+		                    console.clear();
+		                    console.log( "status: " + result.status );
+		                    console.log( "data-score: " + result.data );
+		                    console.log( "mensaje: " + result.message );
+		                    if (result.data) {
+		                    	console.log(result.data[0]);
+		                    }
+		                }
+		            });
+            		//----------------------------------
+            	}
+
+            	$('input[name="resp"]').prop("checked", false);
+	    	});
+
+	    	$(".bt_continue").click(function(){
+            	$(".alert").css("display","none");
+            	cargar_score();
+            	cargar_pregunta();
+	    	});
+
+        });
+	</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Registro</title>
+	<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="dist/css/style.css">
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+	<header>
+		<div>
+			<img src="dist/img/logo.png" style="width: 80%; max-width: 500px;">
+		</div>
+	</header>
+	<section id="Registro" class="container">
+		<form id="form_r">
+            <div class="col-xs-6"">
+    			<div class="form-group">
+                    <label>Nombre</label>
+                    <input class="form-control" type="text" id="" name="nombre" placeholder="Escriba su Nombre">
+                </div>
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input class="form-control" type="text" id="" name="apellidos" placeholder="Escriba su Apellido">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input class="form-control" type="text" id="" name="mail" placeholder="Escriba su Correo Electronico">
+                </div>
+            </div>
+            <div class="col-xs-6"">
+                <div class="form-group">
+                    <label>Contrase&ntilde;a</label>
+                    <input class="form-control" type="text" id="contrasena_1" name="contrasena_1" placeholder="Escriba su Contrase&ntilde;a">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Contrase&ntilde;a</label>
+                    <input class="form-control" type="text" id="contrasena_2" name="contrasena_2" placeholder="Vuelve escriba su Contrase&ntilde;a">
+                </div>
+                <div class="checkbox">
+    				<label><input type="checkbox" value="1" id="checkbox">Acepto los terminos de uso</label>
+    			</div>
+                <button class="btn btn-primary btn-lg center-block" type="button" id="bt_registrar">Registrarse</button>
+            </div>
+    	</form>
+	</section>
+	<footer>
+		<p>Todos los derechos reservados<p>
+		<p>Universidad de Cordoba</p>
+	</footer>
+	<script src="dist/js/jquery.js"></script>
+	<script>
+		$(document).ready(function() {
+            console.log( "ready!" );
+
+            $("#bt_registrar").click(function(){
+            	//$(location).attr('href','home.html');
+                if(! $('#checkbox').prop('checked') ) {
+                    alert('Debe Aceptar los terminos de uso');
+                }else if( $("#contrasena_1").val() != $("#contrasena_2").val() ) {
+                    alert('Las contraseñas no coinciden');
+                }else {
+                    var base_url = "http://localhost/_Raiz/jesus%20flores/backend/api/";
+
+                    $.ajax({
+                        type: "POST",
+                        //concatenamos la direccion del backend con la consulta que se quiere realizar
+                        url: base_url+"usuario", //urlbase + consulta
+                        //tipo de dato retornado
+                        dataType: "json",
+                        //formulario donde se encuentran los datos
+                        data: $( "#form_r" ).serialize() ,
+                        //en caso de que se ejecute satisfactoriamente el en envio
+                        success: function(result){
+                            //limpiamos la consola y mostramos los datos como prueba de escritorio, esto no es necesario
+                            console.clear();
+                            console.log( "status: " + result.status );
+                            console.log( "data: " + result.data );
+                            console.log( "mensaje: " + result.message );
+                            //limpiamos el formulario
+                            $("#form_r")[0].reset();
+                            alert('Registro exitoso. ya puede hacer uso de la aplicaion');
+                        },
+                    });
+                }
+
+	    	});
+        });
+	</script>
+</body>
+</html>
